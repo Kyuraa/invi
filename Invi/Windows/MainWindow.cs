@@ -196,6 +196,7 @@ public class MainWindow : Window, IDisposable
             _ = ResetCountAfterDelayAsync();
         }
         
+
     }
 
     private async Task ResetCountAfterDelayAsync()
