@@ -341,6 +341,7 @@ public class MainWindow : Window, IDisposable
     //    this.tippyAnim = anim;
     //    this.tippyAnimUp = true;
     //    this.tippyLoopAnim = loop;
+
     //}
 
     //private Vector2 ToSpriteSheetScale(Vector2 input) => new Vector2(input.X / this.tippySpriteSheet.Width, input.Y / this.tippySpriteSheet.Height);
