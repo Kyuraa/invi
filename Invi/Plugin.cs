@@ -66,6 +66,7 @@ public sealed class Plugin : IDalamudPlugin
         Log.Information($"===A cool log message from {PluginInterface.Manifest.Name}===");
 
 
+
         MainWindow.Toggle();
 
         
