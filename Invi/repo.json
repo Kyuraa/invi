@@ -4,7 +4,8 @@
         "Name": "Invi",
         "Punchline": "Big Boss",
         "Description": "/xdd for something idk",
-        "ApplicableVersion": "0.0.0.69",
+        "ApplicableVersion": "any",
+        "AssemblyVersion": "0.0.01.69",
         "Tags": [
             "big boss",
             "plugin"

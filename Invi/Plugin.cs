@@ -90,6 +90,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         // In response to the slash command, toggle the display status of our main ui
         MainWindow.Toggle();
+
     }
     
     public void ToggleConfigUi() => ConfigWindow.Toggle();
