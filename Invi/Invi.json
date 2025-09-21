@@ -1,16 +1,19 @@
 {
-  "Author": "Kyura",
-  "Name": "Invi",
-  "Punchline": "Big Boss",
-  "Description": "/xdd for something idk",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "big boss",
-    "plugin",
-  ],
-  "RepoUrl": "https://github.com/Kyuraa/invi",
-  "DownloadLinkInstall": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
-  "DownloadLinkTesting": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
-  "DownloadLinkUpdate": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
-  
+    "Author": "Kyura",
+    "Name": "Invi",
+    "Punchline": "Big Boss",
+    "Description": "/xdd for something idk",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "big boss",
+        "plugin"
+    ],
+    "RepoUrl": "https://github.com/Kyuraa/invi",
+    "DownloadLinkInstall": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
+    "DownloadLinkTesting": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
+    "DownloadLinkUpdate": "https://www.dropbox.com/scl/fi/o0ux5b7ltpxyb3b3j1lgl/latest.zip?rlkey=ll5uusaxg0u7ct5eiff0rx02w&st=e7szzqd7&dl=1",
+    "IsHide": false,
+    "DalamudApiLevel": 13,
+    "InternalName": "Invi",
+
 }
