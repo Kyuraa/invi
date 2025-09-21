@@ -1,7 +1,7 @@
 ﻿using Dalamud.Configuration;
 using System;
 
-namespace SamplePlugin;
+namespace Invi;
 
 [Serializable]
 public class Configuration : IPluginConfiguration
