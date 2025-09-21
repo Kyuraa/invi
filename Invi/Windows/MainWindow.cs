@@ -18,6 +18,7 @@ using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using NAudio.Wave;
 
 
 namespace Invi.Windows;
@@ -27,10 +28,21 @@ public class MainWindow : Window, IDisposable
     private readonly string goatImagePath;
     private readonly Plugin plugin;
     private readonly string doroImagePath;
+    private readonly string bigbossImagePath;
+
     //private readonly string tippypath;
     //private readonly IDalamudTextureWrap tippySpriteSheet;
     private int count = 0;
 
+    private WaveFileReader waveFileReader;
+    private WaveOutEvent waveOut;
+    private TimeSpan audioDuration = TimeSpan.Zero;
+
+    /// <summary>
+    /// initialize main window
+    /// </summary>
+    /// <param name="plugin"></param>
+    /// <param name="goatImagePath"></param> /// should remove this later   
     public MainWindow(Plugin plugin, string goatImagePath)
         : base("Invi owo##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
@@ -43,8 +55,15 @@ public class MainWindow : Window, IDisposable
         this.goatImagePath = goatImagePath;
         this.plugin = plugin;
         doroImagePath = Path.Combine(Plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "dorodance.gif");
+        bigbossImagePath= Path.Combine(Plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "big_boss.gif");
 
-        
+        var soundPath = Path.Combine(Plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "invisible-duran.wav");
+        waveFileReader = new WaveFileReader(soundPath);
+        waveOut = new WaveOutEvent();
+        waveOut.Init(waveFileReader);
+
+
+        audioDuration = waveFileReader.TotalTime;
 
         //tippypath= Path.Combine(Plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "dorodance.gif");
         //tippySpriteSheet = Plugin.TextureProvider.GetFromFile(doroImagePath).GetWrapOrEmpty();
@@ -57,6 +76,9 @@ public class MainWindow : Window, IDisposable
         resetCancellation?.Cancel();
         resetCancellation?.Dispose();
         resetCancellation = null;
+
+        waveOut?.Dispose();
+        waveFileReader?.Dispose();
 
     }
 
@@ -74,10 +96,21 @@ public class MainWindow : Window, IDisposable
         if (ImGui.Button("send message"))
         {
 
+
             //chatGui.Print("test");
             //Plugin.chatGui.Print("test2");
 
             
+        }
+        if (ImGui.Button("play sound"))
+        {
+
+            waveFileReader.Position = 0; // Reset to beginning
+            waveOut.Play();
+            //chatGui.Print("test");
+            //Plugin.chatGui.Print("test2");
+
+
         }
 
         Plugin.chatGui.ChatMessage += ChatGui_ChatMessage;
@@ -139,9 +172,11 @@ public class MainWindow : Window, IDisposable
 
 
 
-                var doroImage = Plugin.TextureProvider.GetFromFile(doroImagePath).GetWrapOrDefault();
+                var doroImage = count == 1 ? Plugin.TextureProvider.GetFromFile(bigbossImagePath).GetWrapOrDefault() : Plugin.TextureProvider.GetFromFile(doroImagePath).GetWrapOrDefault();
+                //var bigbossImage= Plugin.TextureProvider.GetFromFile(bigbossImagePath).GetWrapOrDefault();
                 if (doroImage != null)
                 {
+ 
                     using (ImRaii.PushIndent(25f))
                     {
                         ImGui.Image(doroImage.Handle, doroImage.Size);
@@ -189,6 +224,11 @@ public class MainWindow : Window, IDisposable
     {
         if (count == 0 && message.TextValue.ToLower().Contains("invisible"))
         {
+            if (!plugin.WindowSystem.Windows[1].IsOpen){
+                plugin.WindowSystem.Windows[1].Toggle();
+            }
+            waveFileReader.Position = 0; // Reset to beginning
+            waveOut.Play();
             //Plugin.chatGui.Print($"[Invi] hi");
             Plugin.chatGui.Print($"{message.TextValue}");
             count++;
@@ -197,8 +237,14 @@ public class MainWindow : Window, IDisposable
         }
         
 
+
     }
 
+
+    /// <summary>
+    /// reset count after a delay
+    /// </summary>
+    /// <returns></returns>
     private async Task ResetCountAfterDelayAsync()
     {
         // Cancel any existing reset operation
@@ -207,7 +253,7 @@ public class MainWindow : Window, IDisposable
 
         try
         {
-            await Task.Delay(5000, resetCancellation.Token); // 5 seconds
+            await Task.Delay(audioDuration, resetCancellation.Token); // 5 seconds
 
             if (!resetCancellation.Token.IsCancellationRequested)
             {

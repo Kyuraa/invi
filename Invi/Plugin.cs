@@ -19,9 +19,8 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
 
     [PluginService] internal static IChatGui chatGui { get; private set; } = null!;
+
     
-
-
 
 
     private const string CommandName = "/xdd";
@@ -67,7 +66,7 @@ public sealed class Plugin : IDalamudPlugin
 
 
 
-        MainWindow.Toggle();
+        MainWindow.Toggle(); // Open the main window on startup
 
         
     }

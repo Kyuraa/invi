@@ -1,14 +1,16 @@
 {
   "Author": "Kyura",
   "Name": "Invi",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
+  "Punchline": "Big Boss",
   "Description": "/xdd for something idk",
   "ApplicableVersion": "any",
   "Tags": [
-    "sample",
+    "big boss",
     "plugin",
-    "goats"
   ],
   "RepoUrl": "https://github.com/Kyuraa/invi",
+  "DownloadLinkInstall": "http://tmpfiles.org/dl/1524179/latest.zip",
+   "DownloadLinkTesting": "http://tmpfiles.org/dl/1524179/latest.zip",
+   "DownloadLinkUpdate": "http://tmpfiles.org/dl/1524179/latest.zip"	,
   
 }
