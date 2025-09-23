@@ -31,6 +31,7 @@ public sealed class Plugin : IDalamudPlugin
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
+    private doroWindow doroWindow { get; init; }
     public Plugin()
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -40,9 +41,11 @@ public sealed class Plugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this, goatImagePath);
+        doroWindow = new doroWindow(this);
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(doroWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {   
@@ -59,6 +62,8 @@ public sealed class Plugin : IDalamudPlugin
         // Adds another button doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUi;
 
+
+
         // Add a simple message to the log with level set to information
         // Use /xllog to open the log window in-game
         // Example Output: 00:57:54.959 | INF | [Invi] ===A cool log message from Sample Plugin===
@@ -67,8 +72,8 @@ public sealed class Plugin : IDalamudPlugin
 
 
         MainWindow.Toggle(); // Open the main window on startup
+        GifLoader.LoadAll(); // Load all gifs on startup
 
-        
     }
 
     public void Dispose()
@@ -84,6 +89,9 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
+
+
+        GifLoader.Dispose();
     }
 
     private void OnCommand(string command, string args)
@@ -95,4 +103,6 @@ public sealed class Plugin : IDalamudPlugin
     
     public void ToggleConfigUi() => ConfigWindow.Toggle();
     public void ToggleMainUi() => MainWindow.Toggle();
+
+    public void ToggleDoroUi() => doroWindow.Toggle();
 }

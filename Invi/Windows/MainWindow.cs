@@ -57,7 +57,7 @@ public class MainWindow : Window, IDisposable
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(600, 600),
+            MinimumSize = new Vector2(250, 250),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
@@ -71,8 +71,7 @@ public class MainWindow : Window, IDisposable
         waveOut = new WaveOutEvent();
         waveOut.Init(waveFileReader);
 
-
-        LoadAll(); //gifs
+        
 
         audioDuration = waveFileReader.TotalTime;
 
@@ -91,9 +90,7 @@ public class MainWindow : Window, IDisposable
         waveOut?.Dispose();
         waveFileReader?.Dispose();
 
-        foreach (var gif in EmoteImages.Values)
-            gif.InnerDispose();
-        EmoteImages.Clear();
+
 
     }
 
@@ -101,6 +98,12 @@ public class MainWindow : Window, IDisposable
     {
 
         ImGui.TextUnformatted($"The random config bool is {plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
+
+        if (ImGui.Button("show doro"))
+        {
+
+            plugin.ToggleDoroUi();
+        }
 
         if (ImGui.Button("Show Settings"))
         {
@@ -129,17 +132,6 @@ public class MainWindow : Window, IDisposable
         }
 
         Plugin.chatGui.ChatMessage += ChatGui_ChatMessage;
-
-        var giftobeload = "doro";
-        if (IsLoaded(giftobeload))
-        {
-            var size = GetSize(giftobeload);
-            Draw(giftobeload, new Vector2(size.Value.X, size.Value.Y));
-        }
-        else
-        {
-            ImGui.Text($"{giftobeload} is loading or missing!");
-        }
 
 
 
@@ -255,8 +247,6 @@ public class MainWindow : Window, IDisposable
             // Start async reset
             _ = ResetCountAfterDelayAsync();
         }
-        
-
 
     }
 
@@ -292,151 +282,7 @@ public class MainWindow : Window, IDisposable
 
 
 
-    // Returns the original size of the gif as a Vector2 (width, height), or null if not loaded.
-    public static Vector2? GetSize(string name)
-    {
-        if (EmoteImages.TryGetValue(name, out var gif) && gif.IsLoaded)
-            return new Vector2(gif.Width, gif.Height);
-        return null;
-    }
-
-
-
-
-
-
-    private static readonly string EmoteDir = Path.Combine(
-    Plugin.PluginInterface.AssemblyLocation.Directory?.FullName!, "Emotes");
-
-    // Cache loaded gifs by filename (without extension)
-    private static readonly Dictionary<string, ImGuiGif> EmoteImages = new();
-
-    // Load all .gif files in the directory
-    public static void LoadAll()
-    {
-        if (!Directory.Exists(EmoteDir))
-            return;
-
-        foreach (var file in Directory.GetFiles(EmoteDir, "*.gif"))
-        {
-            var name = Path.GetFileNameWithoutExtension(file);
-            if (!EmoteImages.ContainsKey(name))
-            {
-                EmoteImages[name] = new ImGuiGif().Prepare(file);
-            }
-        }
-    }
-
-    // Draw the gif by name (filename without .gif)
-    public static void Draw(string name, Vector2 size)
-    {
-        if (EmoteImages.TryGetValue(name, out var gif) && gif.IsLoaded)
-        {
-            gif.Draw(size);
-        }
-        else
-        {
-            ImGui.Text($"GIF '{name}' not loaded or missing!");
-        }
-    }
-
- 
-
-
-    public sealed class ImGuiGif
-    {
-        private List<(IDalamudTextureWrap Texture, float Delay)> Frames = [];
-        private float FrameTimer;
-        private int CurrentFrame;
-        private ulong GlobalFrameCount;
-        public bool IsLoaded { get; private set; }
-        public bool Failed { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-
-        public void Draw(Vector2 size)
-        {
-            if (Frames.Count == 0)
-                return;
-
-            if (CurrentFrame >= Frames.Count)
-            {
-                CurrentFrame = 0;
-                FrameTimer = -1f;
-            }
-
-            var frame = Frames[CurrentFrame];
-            if (FrameTimer <= 0.0f)
-                FrameTimer = frame.Delay;
-
-            ImGui.Image(frame.Texture.Handle, size);
-
-            if (GlobalFrameCount == Plugin.PluginInterface.UiBuilder.FrameCount)
-                return;
-
-            GlobalFrameCount = Plugin.PluginInterface.UiBuilder.FrameCount;
-
-            FrameTimer -= ImGui.GetIO().DeltaTime;
-            if (FrameTimer <= 0f)
-                CurrentFrame++;
-        }
-
-        public void InnerDispose()
-        {
-            Frames.ForEach(f => f.Texture.Dispose());
-            Frames.Clear();
-        }
-
-        public ImGuiGif Prepare(string filePath)
-        {
-            Task.Run(() => Load(filePath));
-            return this;
-        }
-
-        private async void Load(string filePath)
-        {
-            try
-            {
-                var imageBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                using var ms = new MemoryStream(imageBytes);
-                using var img = Image.Load<Rgba32>(ms);
-                if (img.Frames.Count == 0)
-                    return;
-
-                Width = img.Width;
-                Height = img.Height;
-
-                var frames = new List<(IDalamudTextureWrap Tex, float Delay)>();
-                foreach (var frame in img.Frames)
-                {
-                    var delay = frame.Metadata.GetGifMetadata().FrameDelay / 100f;
-                    if (delay < 0.02f)
-                        delay = 0.1f;
-
-                    var buffer = new byte[4 * frame.Width * frame.Height];
-                    frame.CopyPixelDataTo(buffer);
-                    var tex = await Plugin.TextureProvider.CreateFromRawAsync(
-                        RawImageSpecification.Rgba32(frame.Width, frame.Height), buffer);
-                    frames.Add((tex, delay));
-                }
-
-                Frames = frames;
-                IsLoaded = true;
-            }
-            catch (Exception ex)
-            {
-                Failed = true;
-                Plugin.Log.Error(ex, $"Unable to load GIF from {filePath}");
-            }
-        }
-    }
     
-
-    // Returns true if the named gif is loaded and IsLoaded is true
-    public static bool IsLoaded(string name)
-    {
-        return EmoteImages.TryGetValue(name, out var gif) && gif.IsLoaded;
-    }
 
 
 
